@@ -1,0 +1,791 @@
+# Imposter word bank
+# ------------------
+# One entry per line. Format:
+#   Word | Tag1, Tag2 | Alias1, Alias2
+#
+# - Word: what the non-imposters actually see for the round.
+# - Tags: one or more categories (comma-separated). A word shows up for a
+#   round whenever the host's chosen category matches any of its tags —
+#   e.g. "Turkey | Animals, Food and Drinks" can appear under either
+#   category. Add a brand-new tag and it automatically becomes a
+#   selectable category — no other code changes needed.
+# - Aliases (optional, third column): alternate spellings/names that also
+#   count as a correct guess for that word. Leave the column out entirely
+#   if there are no aliases.
+#
+# Lines starting with # are comments (handy as section headers) and are
+# ignored, as are blank lines.
+
+# Animals
+Lion | Animals
+Tiger | Animals
+Elephant | Animals
+Rhino | Animals
+Dolphin | Animals
+Shark | Animals
+Eagle | Animals
+Wolf | Animals
+Penguin | Animals
+Kangaroo | Animals
+Octopus | Animals
+Turkey | Animals, Food and Drinks
+Dog | Animals
+Cat | Animals
+Monkey | Animals
+Giraffe | Animals
+Rabbit | Animals
+Horse | Animals
+Butterfly | Animals
+Owl | Animals
+Bear | Animals
+# Food and Drinks
+Pizza | Food and Drinks
+Taco | Food and Drinks
+Sushi | Food and Drinks
+Pancake | Food and Drinks
+Burger | Food and Drinks
+Croissant | Food and Drinks
+Noodles | Food and Drinks
+Bagel | Food and Drinks
+Donut | Food and Drinks, Dessert
+Pumpkin Pie | Food and Drinks, Dessert
+Apple Pie | Food and Drinks, Dessert
+Ice Cream | Food and Drinks, Dessert
+Birthday Cake | Food and Drinks, Dessert
+Candy Cane | Food and Drinks, Dessert
+Hot Chocolate | Food and Drinks
+Eggnog | Food and Drinks
+Lemonade | Food and Drinks
+Coffee | Food and Drinks
+Smoothie | Food and Drinks
+Easter Egg | Food and Drinks
+Watermelon | Food and Drinks
+Hamburger | Food and Drinks
+Spaghetti | Food and Drinks
+Sandwich | Food and Drinks
+Chocolate | Food and Drinks, Dessert
+Popcorn | Food and Drinks
+Banana | Food and Drinks
+Orange Juice | Food and Drinks
+Cookies | Food and Drinks, Dessert
+French Fries | Food and Drinks
+# Sports
+Soccer | Sports
+Basketball | Sports
+Tennis | Sports
+Golf | Sports
+Boxing | Sports
+Surfing | Sports
+Cycling | Sports
+Hockey | Sports
+Swimming | Sports
+Marathon | Sports
+Olympics | Sports
+Home Run | Sports
+Slam Dunk | Sports
+Penalty Kick | Sports
+Gold Medal | Sports
+World Cup | Sports
+Championship | Sports
+Referee | Sports
+Halftime | Sports
+# Places
+Beach | Places
+Mountain | Places, Nature & Outdoors
+Desert | Places, Nature & Outdoors
+Forest | Places
+Castle | Places
+Airport | Places, Transportation
+Library | Places
+Farm | Places
+Hospital | Places
+Gym | Places
+Museum | Places
+Casino | Places
+Aquarium | Places
+Amusement Park | Places
+Supermarket | Places
+Bakery | Places
+Laundromat | Places
+Concert Hall | Places, Music
+Parking Lot | Places, Transportation
+Rooftop | Places
+# Household
+Umbrella | Household
+Backpack | Household
+Candle | Household
+Mirror | Household
+Blanket | Household
+Kettle | Household
+Broom | Household
+Ladder | Household
+Christmas Tree | Household
+Phone | Household, Technology & Internet
+Chair | Household
+Toothbrush | Household
+Sunglasses | Household, Fashion & Clothing
+Pillow | Household
+Keys | Household
+Wallet | Household
+Clock | Household
+Lamp | Household
+Headphones | Household, Music
+Scissors | Household
+# Jobs
+Doctor | Jobs
+Chef | Jobs
+Pilot | Jobs
+Teacher | Jobs
+Firefighter | Jobs
+Artist | Jobs
+Farmer | Jobs
+Plumber | Jobs
+Astronaut | Jobs
+Magician | Jobs
+Lifeguard | Jobs
+Bartender | Jobs
+Florist | Jobs
+Detective | Jobs
+Veterinarian | Jobs
+Electrician | Jobs
+Tour Guide | Jobs
+Nurse | Jobs
+Police Officer | Jobs
+Singer | Jobs
+Athlete | Jobs
+Librarian | Jobs
+Engineer | Jobs
+Lawyer | Jobs
+Dancer | Jobs
+Mechanic | Jobs
+Scientist | Jobs
+Actor | Jobs
+Author | Jobs
+Soldier | Jobs
+Baker | Jobs
+Archaeologist | Jobs
+Astronomer | Jobs
+Mathematician | Jobs
+Fashion Designer | Jobs
+Diplomat | Jobs
+Geologist | Jobs
+Biologist | Jobs
+Sculptor | Jobs
+Politician | Jobs
+Architect | Jobs
+# Seasonal
+Mistletoe | Seasonal
+Fireworks | Seasonal, Holidays & Celebrations
+Jack-o'-lantern | Seasonal
+Champagne Toast | Seasonal, Food and Drinks
+Resolution | Seasonal
+Costume Party | Seasonal
+Gift Wrap | Seasonal, Household
+Countdown | Seasonal
+Thanksgiving Turkey | Seasonal, Food and Drinks
+Valentine Card | Seasonal
+Leprechaun | Seasonal
+Stocking Stuffer | Seasonal
+# Movies & TV
+Star Wars | Movies & TV
+Harry Potter | Movies & TV, Harry Potter
+The Lion King | Movies & TV
+Titanic | Movies & TV
+Jurassic Park | Movies & TV
+Batman | Movies & TV
+Frozen | Movies & TV
+Breaking Bad | Movies & TV
+Stranger Things | Movies & TV
+Spider-Man | Movies & TV
+Finding Nemo | Movies & TV
+The Simpsons | Movies & TV
+Squid Game | Movies & TV
+# Countries & Landmarks
+Paris | Countries & Landmarks
+New York | Countries & Landmarks
+Tokyo | Countries & Landmarks
+London | Countries & Landmarks
+Italy | Countries & Landmarks
+Australia | Countries & Landmarks
+Brazil | Countries & Landmarks
+Egypt | Countries & Landmarks
+Hawaii | Countries & Landmarks
+Las Vegas | Countries & Landmarks
+Hollywood | Countries & Landmarks, Movies & TV
+Disney World | Countries & Landmarks, Movies & TV
+Grand Canyon | Countries & Landmarks
+Niagara Falls | Countries & Landmarks
+Amazon Rainforest | Countries & Landmarks
+Japan | Countries & Landmarks
+South Korea | Countries & Landmarks
+Seoul | Countries & Landmarks
+Taiwan | Countries & Landmarks
+China | Countries & Landmarks
+Canada | Countries & Landmarks
+Vancouver | Countries & Landmarks
+United States | Countries & Landmarks | USA, United States of America, US
+Pyramids | Countries & Landmarks | Pyramids of Giza, The Pyramids
+Hong Kong | Countries & Landmarks
+Los Angeles | Countries & Landmarks | LA
+Sydney | Countries & Landmarks
+Dubai | Countries & Landmarks
+Beijing | Countries & Landmarks
+Rome | Countries & Landmarks
+Kyoto | Countries & Landmarks
+San Francisco | Countries & Landmarks
+Mexico | Countries & Landmarks
+United Kingdom | Countries & Landmarks | UK
+Germany | Countries & Landmarks
+France | Countries & Landmarks
+Great Wall of China | Countries & Landmarks | The Great Wall
+Stonehenge | Countries & Landmarks
+Statue of Liberty | Countries & Landmarks
+Colosseum | Countries & Landmarks | The Colosseum, Coliseum
+# Music
+Guitar | Music
+Piano | Music
+Drums | Music
+Karaoke | Music
+Concert | Music
+DJ | Music
+Microphone | Music
+Playlist | Music
+Lyrics | Music
+Music Video | Music
+Album Cover | Music
+Backstage | Music
+Autograph | Music, Movies & TV
+Fan Club | Music
+# Technology & Internet
+Smartphone | Technology & Internet
+Selfie | Technology & Internet
+Emoji | Technology & Internet
+Password | Technology & Internet
+WiFi | Technology & Internet
+Streaming | Technology & Internet
+Notification | Technology & Internet
+Screenshot | Technology & Internet
+Download | Technology & Internet
+Charger | Technology & Internet
+Airplane Mode | Technology & Internet
+Video Call | Technology & Internet
+Online Shopping | Technology & Internet
+Smart Watch | Technology & Internet, Fashion & Clothing
+Voice Assistant | Technology & Internet
+# Fashion & Clothing
+Jeans | Fashion & Clothing
+Sneakers | Fashion & Clothing
+Handbag | Fashion & Clothing
+Jewelry | Fashion & Clothing
+Makeup | Fashion & Clothing
+Hair Salon | Fashion & Clothing
+Fashion Show | Fashion & Clothing
+Vintage | Fashion & Clothing
+Designer | Fashion & Clothing
+Wardrobe | Fashion & Clothing
+Fitting Room | Fashion & Clothing
+Shopping Bag | Fashion & Clothing
+Sale Rack | Fashion & Clothing
+Dress Code | Fashion & Clothing
+# Transportation
+Airplane | Transportation
+Subway | Transportation
+Taxi | Transportation
+Bicycle | Transportation
+Motorcycle | Transportation
+Cruise Ship | Transportation
+Hot Air Balloon | Transportation
+Helicopter | Transportation
+Road Trip | Transportation
+Traffic Jam | Transportation
+Parking Spot | Transportation
+Gas Station | Transportation
+Flat Tire | Transportation
+Speed Limit | Transportation
+Rush Hour | Transportation
+# League of Legends
+Aatrox | League of Legends
+Ahri | League of Legends
+Akali | League of Legends
+Akshan | League of Legends
+Alistar | League of Legends
+Ambessa | League of Legends
+Amumu | League of Legends
+Anivia | League of Legends
+Annie | League of Legends
+Aphelios | League of Legends
+Ashe | League of Legends
+Aurelion Sol | League of Legends
+Aurora | League of Legends
+Azir | League of Legends
+Bard | League of Legends
+Bel'Veth | League of Legends
+Blitzcrank | League of Legends
+Brand | League of Legends
+Braum | League of Legends
+Briar | League of Legends
+Caitlyn | League of Legends
+Camille | League of Legends
+Cassiopeia | League of Legends
+Cho'Gath | League of Legends
+Corki | League of Legends
+Darius | League of Legends
+Diana | League of Legends
+Dr. Mundo | League of Legends
+Draven | League of Legends
+Ekko | League of Legends
+Elise | League of Legends
+Evelynn | League of Legends
+Ezreal | League of Legends
+Fiddlesticks | League of Legends
+Fiora | League of Legends
+Fizz | League of Legends
+Galio | League of Legends
+Gangplank | League of Legends
+Garen | League of Legends
+Gnar | League of Legends
+Gragas | League of Legends
+Graves | League of Legends
+Gwen | League of Legends
+Hecarim | League of Legends
+Heimerdinger | League of Legends
+Hwei | League of Legends
+Illaoi | League of Legends
+Irelia | League of Legends
+Ivern | League of Legends
+Janna | League of Legends
+Jarvan IV | League of Legends
+Jax | League of Legends
+Jayce | League of Legends
+Jhin | League of Legends
+Jinx | League of Legends
+K'Sante | League of Legends
+Kai'Sa | League of Legends
+Kalista | League of Legends
+Karma | League of Legends
+Karthus | League of Legends
+Kassadin | League of Legends
+Katarina | League of Legends
+Kayle | League of Legends
+Kayn | League of Legends
+Kennen | League of Legends
+Kha'Zix | League of Legends
+Kindred | League of Legends
+Kled | League of Legends
+Kog'Maw | League of Legends
+LeBlanc | League of Legends
+Lee Sin | League of Legends
+Leona | League of Legends
+Lillia | League of Legends
+Lissandra | League of Legends
+Locke | League of Legends
+Lucian | League of Legends
+Lulu | League of Legends
+Lux | League of Legends
+Malphite | League of Legends
+Malzahar | League of Legends
+Maokai | League of Legends
+Master Yi | League of Legends
+Mel | League of Legends
+Milio | League of Legends
+Miss Fortune | League of Legends
+Mordekaiser | League of Legends
+Morgana | League of Legends
+Naafiri | League of Legends
+Nami | League of Legends, One Piece, Anime
+Nasus | League of Legends
+Nautilus | League of Legends
+Neeko | League of Legends
+Nidalee | League of Legends
+Nilah | League of Legends
+Nocturne | League of Legends
+Nunu & Willump | League of Legends
+Olaf | League of Legends
+Orianna | League of Legends
+Ornn | League of Legends
+Pantheon | League of Legends
+Poppy | League of Legends
+Pyke | League of Legends
+Qiyana | League of Legends
+Quinn | League of Legends
+Rakan | League of Legends
+Rammus | League of Legends
+Rek Sai | League of Legends
+Rell | League of Legends
+Renata Glasc | League of Legends
+Renekton | League of Legends
+Rengar | League of Legends
+Riven | League of Legends
+Rumble | League of Legends
+Ryze | League of Legends
+Samira | League of Legends
+Sejuani | League of Legends
+Senna | League of Legends
+Seraphine | League of Legends
+Sett | League of Legends
+Shaco | League of Legends
+Shen | League of Legends
+Shyvana | League of Legends
+Singed | League of Legends
+Sion | League of Legends
+Sivir | League of Legends
+Skarner | League of Legends
+Smolder | League of Legends
+Sona | League of Legends
+Soraka | League of Legends
+Swain | League of Legends
+Sylas | League of Legends
+Syndra | League of Legends
+Talon | League of Legends
+Taliyah | League of Legends
+Taric | League of Legends
+Teemo | League of Legends
+Thresh | League of Legends
+Tristana | League of Legends
+Trundle | League of Legends
+Tryndamere | League of Legends
+Twisted Fate | League of Legends
+Twitch | League of Legends
+Udyr | League of Legends
+Urgot | League of Legends
+Varus | League of Legends
+Vayne | League of Legends
+Veigar | League of Legends
+Vex | League of Legends
+Vi | League of Legends
+Viego | League of Legends
+Viktor | League of Legends
+Vladimir | League of Legends
+Vel'Koz | League of Legends
+Volibear | League of Legends
+Warwick | League of Legends
+Wukong | League of Legends
+Xayah | League of Legends
+Xerath | League of Legends
+Xin Zhao | League of Legends
+Yasuo | League of Legends
+Yone | League of Legends
+Yorick | League of Legends
+Yunara | League of Legends
+Yuumi | League of Legends
+Zac | League of Legends
+Zaahen | League of Legends
+Zed | League of Legends
+Zeri | League of Legends
+Ziggs | League of Legends
+Zilean | League of Legends
+Zoe | League of Legends
+Zyra | League of Legends
+Piltover | League of Legends
+Zaun | League of Legends
+Freljord | League of Legends
+Targon | League of Legends
+Demacia | League of Legends
+Noxus | League of Legends
+Shurima | League of Legends
+The Void | League of Legends
+Ixtal | League of Legends
+Bandle City | League of Legends
+Bilgewater | League of Legends
+Shadow Isles | League of Legends
+Ionia | League of Legends
+Summoner's Rift | League of Legends
+Scuttle Crab | League of Legends
+Baron | League of Legends
+Elder Dragon | League of Legends
+# One Piece
+Monkey D. Luffy | One Piece, Anime | Luffy
+Roronoa Zoro | One Piece, Anime | Zoro
+Vinsmoke Sanji | One Piece, Anime | Sanji
+Trafalgar Law | One Piece, Anime | Law
+Nico Robin | One Piece, Anime | Robin
+Boa Hancock | One Piece, Anime | Hancock
+Carrot | One Piece, Anime
+Portgas D. Ace | One Piece, Anime | Ace
+Sabo | One Piece, Anime
+Yamato | One Piece, Anime
+Shanks | One Piece, Anime | Red-Haired Shanks
+Donquixote Rosinante | One Piece, Anime | Rosinante
+Charlotte Katakuri | One Piece, Anime | Katakuri
+Usopp | One Piece, Anime
+Tony Tony Chopper | One Piece, Anime | Chopper
+Crocodile | One Piece, Anime | Sir Crocodile
+Jinbe | One Piece, Anime
+Marco | One Piece, Anime
+Donquixote Doflamingo | One Piece, Anime | Doflamingo
+Koby | One Piece, Anime
+Garp | One Piece, Anime | Monkey D. Garp
+Brook | One Piece, Anime
+Smoker | One Piece, Anime
+Gold Roger | One Piece, Anime | Gol D. Roger, Roger
+Silvers Rayleigh | One Piece, Anime | Rayleigh
+Franky | One Piece, Anime
+Mihawk | One Piece, Anime | Dracule Mihawk
+Whitebeard | One Piece, Anime | Edward Newgate
+Blackbeard | One Piece, Anime | Marshall D. Teach
+Kaido | One Piece, Anime
+Big Mom | One Piece, Anime | Charlotte Linlin
+Buggy | One Piece, Anime
+Sakazuki | One Piece, Anime | Akainu
+Shirahoshi | One Piece, Anime
+Borsalino | One Piece, Anime | Kizaru
+Kuzan | One Piece, Anime | Aokiji
+Wano | One Piece, Anime
+Enel | One Piece, Anime
+Rob Lucci | One Piece, Anime | Lucci
+# Demon Slayer
+Kamado Tanjiro | Demon Slayer, Anime | Tanjiro
+Kamado Nezuko | Demon Slayer, Anime | Nezuko
+Agatsuma Zenitsu | Demon Slayer, Anime | Zenitsu
+Hashibira Inosuke | Demon Slayer, Anime | Inosuke
+Kyojuro Rengoku | Demon Slayer, Anime | Rengoku
+Shinobu Kocho | Demon Slayer, Anime | Shinobu
+Uzui Tengen | Demon Slayer, Anime | Tengen
+Mitsuri Kanroji | Demon Slayer, Anime | Mitsuri
+Tokito Muichirou | Demon Slayer, Anime | Muichiro
+# Anime
+Kirito | Anime | Kazuto Kirigaya
+Yuuki Asuna | Anime | Asuna
+Alphonse Elric | Anime | Alphonse
+Edward Elric | Anime | Edward
+Roy Mustang | Anime | Mustang
+Lelouch Lamperouge | Anime | Lelouch, Lelouch vi Britannia
+Sword Art Online | Anime | SAO
+Code Geass | Anime
+Death Note | Anime
+Light Yagami | Anime | Kira
+L | Anime | L Lawliet
+Misa Amane | Anime | Misa
+Natsuki Subaru | Anime | Subaru
+Emilia | Anime
+Rem | Anime
+Ram | Anime
+Beatrice | Anime
+Argyle Felix | Anime | Felix Argyle
+Steins Gate | Anime | Steins;Gate
+Okabe Rintarou | Anime | Rintarou Okabe, Okabe
+Makise Kurisu | Anime | Kurisu Makise, Kurisu
+Shiina Mayuri | Anime | Mayuri
+Denji | Anime
+Power | Anime
+Makima | Anime
+Vinland Saga | Anime
+Chainsaw Man | Anime
+Thorfinn | Anime
+Mob Psycho 100 | Anime
+Neon Genesis Evangelion | Anime | Evangelion, Eva
+Link Click | Anime
+Gurren Lagann | Anime
+Great Teach Onizuka | Anime | Great Teacher Onizuka, GTO
+Made In Abyss | Anime
+Mushoku Tensei | Anime
+Solo Leveling | Anime
+Promised Neverland | Anime | The Promised Neverland
+My Hero Academia | Anime
+All Might | Anime
+Izuku Midoriya | Anime | Deku
+Bakugou Katsuki | Anime | Katsuki Bakugo, Bakugo
+Uraraka Ochako | Anime | Ochako Uraraka
+Shouto Todoroki | Anime | Todoroki
+Hunter X Hunter | Anime | Hunter x Hunter
+Tokyo Ghoul | Anime
+Ken Kaneki | Anime | Kaneki
+Konosuba | Anime | KonoSuba
+Megumin | Anime
+Kazuma Satou | Anime | Satou Kazuma
+Aqua | Anime
+Darkness | Anime
+Parasyte | Anime
+Erased | Anime
+Naruto | Anime
+Bleach | Anime
+Fullmetal Alchemist | Anime
+Dororo | Anime
+Dragon Ball Z | Anime | DBZ
+Son Goku | Anime | Goku
+Vegeta | Anime
+Piccolo | Anime
+Son Gohan | Anime | Gohan
+Bulma | Anime
+Inu Yasha | Anime | Inuyasha
+No Game No Life | Anime
+Kaiji | Anime
+Hajime No Ippo | Anime | Ippo
+# Jujutsu Kaisen
+Jujutsu Kaisen | Anime, Jujutsu Kaisen
+Gojo Satoru | Anime, Jujutsu Kaisen | Satoru Gojo, Gojo
+Nanami Kento | Anime, Jujutsu Kaisen | Kento Nanami, Nanami
+Ryoumen Sukuna | Anime, Jujutsu Kaisen | Sukuna
+Yuuji Itadori | Anime, Jujutsu Kaisen | Itadori Yuji, Yuji Itadori
+Fushiguro Megumi | Anime, Jujutsu Kaisen | Megumi Fushiguro, Megumi
+Kugisaki Nobara | Anime, Jujutsu Kaisen | Nobara Kugisaki, Nobara
+Geto Suguru | Anime, Jujutsu Kaisen | Suguru Geto, Geto
+Zenin Maki | Anime, Jujutsu Kaisen | Maki Zenin, Maki
+Okkotsu Yuuta | Anime, Jujutsu Kaisen | Yuta Okkotsu
+Fushiguro Touji | Anime, Jujutsu Kaisen | Touji Fushiguro, Toji
+Inumaki Toge | Anime, Jujutsu Kaisen | Toge Inumaki
+Panda | Anime, Jujutsu Kaisen
+Mahito | Anime, Jujutsu Kaisen
+# Attack on Titan
+Attack on Titan | Anime, Attack on Titan
+Eren Yeagar | Anime, Attack on Titan | Eren Yeager, Eren Jaeger
+Mikasa Ackerman | Anime, Attack on Titan | Mikasa
+Armin Arlet | Anime, Attack on Titan | Armin Arlert, Armin
+Levi Ackerman | Anime, Attack on Titan | Levi, Captain Levi
+Erwin Smith | Anime, Attack on Titan | Erwin
+Zoe Hange | Anime, Attack on Titan | Hange Zoe, Hange
+Sasha Blouse | Anime, Attack on Titan | Sasha, Potato Girl
+Annie Leonhart | Anime, Attack on Titan | Annie
+Reiner Braun | Anime, Attack on Titan | Reiner
+Bertolt Hoover | Anime, Attack on Titan | Bertholdt Hoover, Bertolt
+Historia | Anime, Attack on Titan | Historia Reiss, Krista Lenz
+# Fantasy
+Dragon | Fantasy
+Fairy | Fantasy
+Wizard | Fantasy
+Giant | Fantasy
+Mermaid | Fantasy
+Troll | Fantasy
+Elf | Fantasy
+Unicorn | Fantasy
+Witch | Fantasy
+Knight | Fantasy
+Griffin | Fantasy
+Phoenix | Fantasy, Valorant
+Centaur | Fantasy
+Minotaur | Fantasy
+Pegasus | Fantasy
+Cyclops | Fantasy
+Goblin | Fantasy
+Genie | Fantasy
+Werewolf | Fantasy
+Vampire | Fantasy
+Chimera | Fantasy
+Kraken | Fantasy
+Basilisk | Fantasy
+Hydra | Fantasy
+Leviathan | Fantasy
+Banshee | Fantasy
+Sphinx | Fantasy
+Golem | Fantasy
+Djinn | Fantasy | Jinn
+# Nature & Outdoors
+Tree | Nature & Outdoors
+Rock | Nature & Outdoors
+River | Nature & Outdoors
+Sun | Nature & Outdoors
+Moon | Nature & Outdoors
+Flower | Nature & Outdoors
+Grass | Nature & Outdoors
+Cloud | Nature & Outdoors
+Leaf | Nature & Outdoors
+Volcano | Nature & Outdoors
+Glacier | Nature & Outdoors
+Canyon | Nature & Outdoors
+Jungle | Nature & Outdoors
+Waterfall | Nature & Outdoors
+Ocean | Nature & Outdoors
+Storm | Nature & Outdoors
+Rainbow | Nature & Outdoors
+Cave | Nature & Outdoors
+Tsunami | Nature & Outdoors
+Earthquake | Nature & Outdoors
+Meteor | Nature & Outdoors
+Eclipse | Nature & Outdoors
+Black Hole | Nature & Outdoors
+Sandstorm | Nature & Outdoors
+Tornado | Nature & Outdoors
+Coral Reef | Nature & Outdoors
+Fossil | Nature & Outdoors
+# Harry Potter
+Hermione Granger | Harry Potter | Hermione
+Ron Weasley | Harry Potter | Ron
+Ginny Weasley | Harry Potter | Ginny
+Neville Longbottom | Harry Potter | Neville
+Voldemort | Harry Potter | Lord Voldemort, Tom Riddle, He Who Must Not Be Named
+Draco Malfoy | Harry Potter | Draco
+Albus Dumbledore | Harry Potter | Dumbledore
+Luna Lovegood | Harry Potter | Luna
+Severus Snape | Harry Potter | Snape
+Sirius Black | Harry Potter | Sirius
+Hagrid | Harry Potter | Rubeus Hagrid
+Remus Lupin | Harry Potter | Lupin, Professor Lupin
+Minerva McGonagall | Harry Potter | McGonagall, Professor McGonagall
+# Holidays & Celebrations
+Birthday | Holidays & Celebrations
+Christmas | Holidays & Celebrations
+Halloween | Holidays & Celebrations
+Easter | Holidays & Celebrations
+New Year | Holidays & Celebrations
+Thanksgiving | Holidays & Celebrations
+Wedding | Holidays & Celebrations
+Graduation | Holidays & Celebrations
+Valentine's Day | Holidays & Celebrations
+Party | Holidays & Celebrations
+Parade | Holidays & Celebrations
+Pumpkin | Holidays & Celebrations
+Santa Claus | Holidays & Celebrations | Santa
+Costume | Holidays & Celebrations
+Cake | Holidays & Celebrations, Food and Drinks, Dessert
+Gift | Holidays & Celebrations | Present
+Balloon | Holidays & Celebrations
+Lantern Festival | Holidays & Celebrations
+Saint Patrick's Day | Holidays & Celebrations | St. Patrick's Day, St Patrick's Day
+# Famous People (incl. Royalty & Titles)
+Queen | Famous People
+King | Famous People
+Prince | Famous People
+Princess | Famous People
+Duke | Famous People
+Donald Trump | Famous People | Trump
+Adolf Hitler | Famous People | Hitler
+William Shakespeare | Famous People | Shakespeare
+Isaac Newton | Famous People | Newton
+Albert Einstein | Famous People | Einstein
+Jesus | Famous People | Jesus Christ
+Mao Zedong | Famous People | Mao, Chairman Mao
+Michael Jackson | Famous People
+Jack the Ripper | Famous People
+
+# Valorant
+Brimstone | Valorant
+Viper | Valorant
+Omen | Valorant
+Killjoy | Valorant
+Cypher | Valorant
+Sova | Valorant
+Sage | Valorant
+Jett | Valorant
+Reyna | Valorant
+Raze | Valorant
+Breach | Valorant
+Skye | Valorant
+Yoru | Valorant
+Astra | Valorant
+KAY/O | Valorant
+Chamber | Valorant
+Neon | Valorant
+Fade | Valorant
+Harbor | Valorant
+Gekko | Valorant
+Deadlock | Valorant
+Iso | Valorant
+Clove | Valorant
+Vyse | Valorant
+Tejo | Valorant
+Waylay | Valorant
+Veto | Valorant
+Miks | Valorant
+Bind | Valorant
+Haven | Valorant
+Split | Valorant
+Ascent | Valorant
+Icebox | Valorant
+Breeze | Valorant
+Lotus | Valorant
+Pearl | Valorant
+Fracture | Valorant
+Sunset | Valorant
+Abyss | Valorant
+Corrode | Valorant
+Summit | Valorant
