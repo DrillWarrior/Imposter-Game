@@ -524,6 +524,7 @@
           .map(n => `<option value="${n}" ${room.imposterCount === n ? 'selected' : ''}>${n}</option>`).join('');
         const secOptions = [15, 30, 45, 60, 90].map(s => `<option value="${s}" ${room.clueSeconds === s ? 'selected' : ''}>${s}s</option>`).join('');
         const guessSecOptions = [10, 15, 20, 30, 45].map(s => `<option value="${s}" ${room.guessSeconds === s ? 'selected' : ''}>${s}s</option>`).join('');
+        const guessEnabled = room.guessEnabled !== false;
         controls = `
           <label class="field-label">Categories (tap once to include, tap again to exclude, tap again to reset)</label>
           ${catPanel}
@@ -531,13 +532,20 @@
           <select id="impSelect">${impOptions}</select>
           <label class="field-label">Seconds per turn (clue rounds)</label>
           <select id="secSelect">${secOptions}</select>
-          <label class="field-label">Seconds for imposter's guess (if caught)</label>
-          <select id="guessSecSelect">${guessSecOptions}</select>
+          <label class="checkbox-row">
+            <input type="checkbox" id="guessEnabledCheck" ${guessEnabled ? 'checked' : ''}/>
+            Let a caught imposter make a last-chance guess at the real word
+          </label>
+          ${guessEnabled ? `
+            <label class="field-label">Seconds for imposter's guess (if caught)</label>
+            <select id="guessSecSelect">${guessSecOptions}</select>
+          ` : ''}
           <button class="btn btn-red" id="beginBtn" ${room.players.length < 3 ? 'disabled' : ''}>Begin Interrogation</button>
           ${room.players.length < 3 ? '<div class="muted center">Need at least 3 agents to begin.</div>' : ''}
         `;
       } else {
-        controls = `<div class="muted center">Categories: <strong>${esc(categoryLabel(room))}</strong> &middot; Imposters: <strong>${room.imposterCount}</strong> &middot; ${room.clueSeconds}s per turn &middot; ${room.guessSeconds}s to guess if caught<br/><br/>Waiting for the host to begin the case…</div>`;
+        const guessNote = room.guessEnabled !== false ? `${room.guessSeconds}s to guess if caught` : 'no last-chance guess if caught';
+        controls = `<div class="muted center">Categories: <strong>${esc(categoryLabel(room))}</strong> &middot; Imposters: <strong>${room.imposterCount}</strong> &middot; ${room.clueSeconds}s per turn &middot; ${guessNote}<br/><br/>Waiting for the host to begin the case…</div>`;
       }
 
       const customWords = room.customWords || [];
@@ -720,6 +728,7 @@
       const imposterNames = (room.imposterIds || []).map(getPlayerName).join(', ');
       let verdictText;
       if (room.caught && room.guessResult === true) verdictText = 'Caught — but guessed the word and steals the round!';
+      else if (room.caught && !room.guessEnabled) verdictText = 'Caught red-handed. Crew wins the round.';
       else if (room.caught && room.guessResult === false) verdictText = 'Caught, and guessed wrong. Crew wins the round.';
       else if (!room.caught) verdictText = 'The imposter blended in and escapes with the round.';
       else verdictText = '';
@@ -776,6 +785,7 @@
     if (byId('impSelect')) byId('impSelect').onchange = (e) => window.__imp_updateSettings({ imposterCount: parseInt(e.target.value, 10) });
     if (byId('secSelect')) byId('secSelect').onchange = (e) => window.__imp_updateSettings({ clueSeconds: parseInt(e.target.value, 10) });
     if (byId('guessSecSelect')) byId('guessSecSelect').onchange = (e) => window.__imp_updateSettings({ guessSeconds: parseInt(e.target.value, 10) });
+    if (byId('guessEnabledCheck')) byId('guessEnabledCheck').onchange = (e) => window.__imp_updateSettings({ guessEnabled: e.target.checked });
     if (byId('beginBtn')) byId('beginBtn').onclick = window.__imp_startRound;
 
     if (byId('customWordInput')) {

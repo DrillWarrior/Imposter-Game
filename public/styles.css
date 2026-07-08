@@ -88,6 +88,12 @@ select{
   border:1.5px solid var(--text-dark);border-radius:2px;background:#fbf8f1;color:var(--text-dark);margin-bottom:12px;
 }
 
+.checkbox-row{
+  display:flex;align-items:flex-start;gap:8px;font-family:var(--font-body);font-size:13px;
+  color:var(--text-dark);margin:2px 0 14px;cursor:pointer;line-height:1.4;
+}
+.checkbox-row input[type=checkbox]{margin-top:2px;flex-shrink:0;width:16px;height:16px;accent-color:var(--stamp-red);cursor:pointer;}
+
 .cat-check-grid{
   display:grid;grid-template-columns:1fr 1fr;gap:4px 10px;margin-bottom:6px;
 }

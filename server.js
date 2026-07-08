@@ -87,6 +87,7 @@ function newRoom(code, hostId, hostName, hostToken) {
     imposterCount: 1,
     clueSeconds: 30,   // per-turn clue timer
     guessSeconds: 20,  // separate timer for the caught imposter's final guess
+    guessEnabled: true, // host toggle: whether a caught imposter gets a last-chance guess at all
     roundNumber: 0,
 
     // per-round fields
@@ -125,6 +126,7 @@ function sanitize(room) {
     imposterCount: room.imposterCount,
     clueSeconds: room.clueSeconds,
     guessSeconds: room.guessSeconds,
+    guessEnabled: room.guessEnabled,
     roundNumber: room.roundNumber,
     turnOrder: room.turnOrder,
     currentTurnIndex: room.currentTurnIndex,
@@ -251,10 +253,16 @@ function computeVoteResult(room) {
 
   if (accused.length === 1 && room.imposterIds.includes(accused[0])) {
     room.caught = true;
-    room.activeGuesserId = accused[0];
-    room.status = 'imposter-guess';
-    scheduleGuessTimer(room);
-    broadcastRoom(room);
+    if (room.guessEnabled) {
+      room.activeGuesserId = accused[0];
+      room.status = 'imposter-guess';
+      scheduleGuessTimer(room);
+      broadcastRoom(room);
+    } else {
+      // Host has disabled the last-chance guess — being caught ends the
+      // round immediately, same scoring as a caught-and-guessed-wrong outcome.
+      finalizeRound(room, false);
+    }
   } else {
     room.caught = false;
     finalizeRound(room, null);
@@ -467,7 +475,7 @@ io.on('connection', (socket) => {
     broadcastRoom(room);
   });
 
-  socket.on('update-settings', ({ categories, excludedCategories, imposterCount, clueSeconds, guessSeconds }) => {
+  socket.on('update-settings', ({ categories, excludedCategories, imposterCount, clueSeconds, guessSeconds, guessEnabled }) => {
     const room = getRoom(socket.data.roomCode);
     if (!room || socket.data.playerId !== room.hostId || room.status !== 'lobby') return;
     if (Array.isArray(categories)) {
@@ -481,6 +489,7 @@ io.on('connection', (socket) => {
     if (imposterCount) room.imposterCount = Math.max(1, Math.min(2, parseInt(imposterCount, 10) || 1));
     if (clueSeconds) room.clueSeconds = Math.max(5, Math.min(180, parseInt(clueSeconds, 10) || 30));
     if (guessSeconds) room.guessSeconds = Math.max(5, Math.min(180, parseInt(guessSeconds, 10) || 20));
+    if (typeof guessEnabled === 'boolean') room.guessEnabled = guessEnabled;
     broadcastRoom(room);
   });
 
