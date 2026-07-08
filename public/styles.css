@@ -183,6 +183,14 @@ select{
 }
 .kick-btn:hover,.kick-btn:active{opacity:1;}
 
+.roster-card{padding-top:6px;padding-bottom:6px;}
+.roster-toggle{
+  width:100%;background:none;border:none;text-align:left;cursor:pointer;
+  font-family:var(--font-mono);font-size:12px;letter-spacing:1px;text-transform:uppercase;
+  color:var(--text-dark);opacity:0.7;padding:6px 2px;
+}
+.roster-toggle:hover{opacity:1;}
+
 .muted{color:#6b6357;font-size:12.5px;line-height:1.5;}
 .center{text-align:center;}
 .error-box{font-family:var(--font-mono);font-size:12.5px;color:var(--stamp-red);text-align:center;margin-bottom:12px;}

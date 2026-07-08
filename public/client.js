@@ -40,7 +40,8 @@
       bulkOpen: false,
       bulkDraft: '',
       catPanelOpen: false,
-      catFilter: ''
+      catFilter: '',
+      rosterOpen: false
     },
     focusedField: null
   };
@@ -144,6 +145,27 @@
       <span class="mini-word">${esc(state.myRole.word)}</span>
     </div>`;
   }
+  // Compact player roster shown during active phases (post-lobby). Lets the
+  // host kick someone mid-game, same as the lobby's player list, without
+  // taking up as much space — collapsed by default, toggled open on tap.
+  function renderRoster(room, isHost) {
+    const rows = room.players.map(p => `
+      <div class="player-row">
+        <span class="player-dot ${p.connected ? '' : 'offline'}"></span>${esc(p.name)}
+        ${p.id === room.hostId
+          ? '<span class="player-host-tag">Host</span>'
+          : (isHost ? `<button class="kick-btn" data-kick="${p.id}" data-kick-name="${esc(p.name)}" title="Remove ${esc(p.name)}">&times;</button>` : '')}
+      </div>`).join('');
+
+    return `
+      <div class="card roster-card">
+        <button class="roster-toggle" id="rosterToggleBtn">
+          Agents (${room.players.length}) ${state.local.rosterOpen ? '&#9650;' : '&#9660;'}
+        </button>
+        ${state.local.rosterOpen ? rows : ''}
+      </div>`;
+  }
+
   function renderClueTable(room) {
     const currentId = room.turnOrder[room.currentTurnIndex];
     const cols = room.turnOrder;
@@ -210,7 +232,7 @@
       local: {
         revealed: false, typedWord: '', clueDraft: '', voted: false, voteSelection: null,
         guessDraft: '', chatDraft: '', customWordDraft: '', customTagDraft: '',
-        bulkOpen: false, bulkDraft: '', catPanelOpen: false, catFilter: ''
+        bulkOpen: false, bulkDraft: '', catPanelOpen: false, catFilter: '', rosterOpen: false
       },
       focusedField: null
     };
@@ -262,6 +284,7 @@
     socket.emit('kick-player', { playerId });
   };
   window.__imp_toggleBulk = function () { state.local.bulkOpen = !state.local.bulkOpen; render(); };
+  window.__imp_toggleRoster = function () { state.local.rosterOpen = !state.local.rosterOpen; render(); };
   window.__imp_addBulkWords = function () {
     const lines = state.local.bulkDraft.split('\n').map(l => l.trim()).filter(Boolean);
     if (!lines.length) return;
@@ -590,6 +613,7 @@
         <div class="card"><div class="card-title">Your Briefing &middot; ${esc(categoryLabel(room))}</div>${inner}</div>
         <div class="card"><div class="card-title">Turn Order</div><div class="order-list">${orderChips}</div></div>
         <div class="card">${hostControls}</div>
+        ${renderRoster(room, isHost)}
         <button class="link-btn" id="leaveBtn">Leave case</button>
       `;
     }
@@ -619,6 +643,7 @@
           ${actionBlock}
         </div>
         <div class="card"><div class="card-title">Case Log</div>${renderClueTable(room)}</div>
+        ${renderRoster(room, isHost)}
         <button class="link-btn" id="leaveBtn">Leave case</button>
       `;
     }
@@ -636,6 +661,7 @@
         </div>
         <div class="card"><div class="card-title">Case Log</div>${renderClueTable(room)}</div>
         <div class="card">${hostControls}</div>
+        ${renderRoster(room, isHost)}
         <button class="link-btn" id="leaveBtn">Leave case</button>
       `;
     }
@@ -657,6 +683,7 @@
           <div class="vote-count">${votedCount} / ${room.players.length} agents have voted</div>
         </div>
         <div class="card">${hostControls || '<div class="muted center">Waiting for the reveal.</div>'}</div>
+        ${renderRoster(room, isHost)}
         <button class="link-btn" id="leaveBtn">Leave case</button>
       `;
     }
@@ -683,6 +710,7 @@
           ${timerBlock}
           ${inner}
         </div>
+        ${renderRoster(room, isHost)}
         <button class="link-btn" id="leaveBtn">Leave case</button>
       `;
     }
@@ -720,6 +748,7 @@
         </div>
         <div class="card"><div class="card-title">Scoreboard</div>${scoreRows}</div>
         <div class="card">${hostControls}</div>
+        ${renderRoster(room, isHost)}
         <button class="link-btn" id="leaveBtn">Leave case</button>
       `;
     }
@@ -772,6 +801,7 @@
     document.querySelectorAll('.kick-btn').forEach(btn => {
       btn.onclick = () => window.__imp_kickPlayer(btn.getAttribute('data-kick'), btn.getAttribute('data-kick-name'));
     });
+    if (byId('rosterToggleBtn')) byId('rosterToggleBtn').onclick = window.__imp_toggleRoster;
 
     if (byId('sealCard')) byId('sealCard').onclick = window.__imp_revealCard;
     if (byId('miniSeal')) byId('miniSeal').onclick = window.__imp_revealCard;
