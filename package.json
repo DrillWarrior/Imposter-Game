@@ -1,0 +1,17 @@
+{
+  "name": "imposter-game",
+  "version": "1.0.0",
+  "description": "Browser-based Imposter party game with real-time multiplayer server",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "socket.io": "^4.7.5"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
