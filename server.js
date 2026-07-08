@@ -312,6 +312,29 @@ function allCategoriesForRoom(room) {
   return Array.from(new Set([...CATEGORY_NAMES, ...room.customWords.flatMap(w => w.tags)])).sort();
 }
 
+// Resets all per-round fields and sends the room back to the lobby /
+// category-select screen. Shared by the normal "start next round" flow
+// (from reveal) and the host's "end case early" abort (from any phase).
+function resetToLobby(room) {
+  clearRoomTimer(room);
+  room.status = 'lobby';
+  room.secretWord = null;
+  room.secretAliases = [];
+  room.imposterHint = null;
+  room.imposterIds = [];
+  room.turnOrder = [];
+  room.currentTurnIndex = 0;
+  room.clueRound = 1;
+  room.clueLog = {};
+  room.turnEndsAt = null;
+  room.votes = {};
+  room.accusedIds = [];
+  room.caught = null;
+  room.activeGuesserId = null;
+  room.guessResult = null;
+}
+
+
 function addOneCustomWord(room, word, tag) {
   const cleanWord = (word || '').trim().slice(0, 40);
   if (!cleanWord) return false;
@@ -611,22 +634,18 @@ io.on('connection', (socket) => {
   socket.on('next-round', () => {
     const room = getRoom(socket.data.roomCode);
     if (!room || socket.data.playerId !== room.hostId) return;
-    clearRoomTimer(room);
-    room.status = 'lobby';
-    room.secretWord = null;
-    room.secretAliases = [];
-    room.imposterHint = null;
-    room.imposterIds = [];
-    room.turnOrder = [];
-    room.currentTurnIndex = 0;
-    room.clueRound = 1;
-    room.clueLog = {};
-    room.turnEndsAt = null;
-    room.votes = {};
-    room.accusedIds = [];
-    room.caught = null;
-    room.activeGuesserId = null;
-    room.guessResult = null;
+    resetToLobby(room);
+    broadcastRoom(room);
+  });
+
+  // Lets the host bail out of an in-progress case at any point (briefing,
+  // clues, discussion, voting, or the imposter's last-chance guess) and send
+  // everyone straight back to the lobby / category-select screen, instead of
+  // having to play the round out to completion.
+  socket.on('end-round', () => {
+    const room = getRoom(socket.data.roomCode);
+    if (!room || socket.data.playerId !== room.hostId || room.status === 'lobby') return;
+    resetToLobby(room);
     broadcastRoom(room);
   });
 

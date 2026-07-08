@@ -166,6 +166,13 @@
       </div>`;
   }
 
+  // Host-only escape hatch: abort the in-progress case at any point and
+  // send everyone back to the lobby / category-select screen.
+  function renderEndCaseBtn(isHost) {
+    if (!isHost) return '';
+    return `<button class="link-btn link-btn-danger" id="endRoundBtn">End case &amp; return to lobby</button>`;
+  }
+
   function renderClueTable(room) {
     const currentId = room.turnOrder[room.currentTurnIndex];
     const cols = room.turnOrder;
@@ -335,6 +342,10 @@
     state.local.guessDraft = '';
   };
   window.__imp_nextRound = function () { socket.emit('next-round'); };
+  window.__imp_endRound = function () {
+    if (!confirm('End this case and send everyone back to the lobby?')) return;
+    socket.emit('end-round');
+  };
   window.__imp_leaveCase = function () { clearSession(); location.reload(); };
   window.__imp_sendChat = function () {
     const text = state.local.chatDraft.trim();
@@ -622,6 +633,7 @@
         <div class="card"><div class="card-title">Turn Order</div><div class="order-list">${orderChips}</div></div>
         <div class="card">${hostControls}</div>
         ${renderRoster(room, isHost)}
+        ${renderEndCaseBtn(isHost)}
         <button class="link-btn" id="leaveBtn">Leave case</button>
       `;
     }
@@ -652,6 +664,7 @@
         </div>
         <div class="card"><div class="card-title">Case Log</div>${renderClueTable(room)}</div>
         ${renderRoster(room, isHost)}
+        ${renderEndCaseBtn(isHost)}
         <button class="link-btn" id="leaveBtn">Leave case</button>
       `;
     }
@@ -670,6 +683,7 @@
         <div class="card"><div class="card-title">Case Log</div>${renderClueTable(room)}</div>
         <div class="card">${hostControls}</div>
         ${renderRoster(room, isHost)}
+        ${renderEndCaseBtn(isHost)}
         <button class="link-btn" id="leaveBtn">Leave case</button>
       `;
     }
@@ -692,6 +706,7 @@
         </div>
         <div class="card">${hostControls || '<div class="muted center">Waiting for the reveal.</div>'}</div>
         ${renderRoster(room, isHost)}
+        ${renderEndCaseBtn(isHost)}
         <button class="link-btn" id="leaveBtn">Leave case</button>
       `;
     }
@@ -719,6 +734,7 @@
           ${inner}
         </div>
         ${renderRoster(room, isHost)}
+        ${renderEndCaseBtn(isHost)}
         <button class="link-btn" id="leaveBtn">Leave case</button>
       `;
     }
@@ -838,6 +854,7 @@
     if (byId('submitGuessBtn')) byId('submitGuessBtn').onclick = window.__imp_submitGuess;
 
     if (byId('nextRoundBtn')) byId('nextRoundBtn').onclick = window.__imp_nextRound;
+    if (byId('endRoundBtn')) byId('endRoundBtn').onclick = window.__imp_endRound;
     if (byId('leaveBtn')) byId('leaveBtn').onclick = window.__imp_leaveCase;
   }
 

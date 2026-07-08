@@ -175,6 +175,7 @@ select{
 .btn-sm{padding:8px 12px;font-size:12px;margin-bottom:0;}
 
 .link-btn{background:none;border:none;color:var(--teal);font-family:var(--font-mono);font-size:12px;text-decoration:underline;cursor:pointer;display:block;margin:0 auto;padding:6px;}
+.link-btn-danger{color:var(--stamp-red);}
 
 .code-badge{font-family:var(--font-mono);font-size:26px;font-weight:600;letter-spacing:7px;text-align:center;color:var(--stamp-red);border:2px dashed var(--stamp-red);border-radius:3px;padding:10px 8px;margin-bottom:14px;background:rgba(179,64,42,0.06);}
 
