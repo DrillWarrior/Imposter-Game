@@ -105,6 +105,7 @@ function newRoom(code, hostId, hostName, hostToken) {
     caught: null,
     activeGuesserId: null,
     guessResult: null, // true | false | null
+    imposterGuessText: null, // the actual text the caught imposter guessed, for the reveal screen
 
     chat: [],
 
@@ -150,6 +151,7 @@ function sanitize(room) {
     base.secretWord = room.secretWord;
     base.secretAliases = room.secretAliases;
     base.imposterIds = room.imposterIds;
+    base.imposterGuessText = room.imposterGuessText;
   }
   return base;
 }
@@ -338,6 +340,7 @@ function resetToLobby(room) {
   room.caught = null;
   room.activeGuesserId = null;
   room.guessResult = null;
+  room.imposterGuessText = null;
 }
 
 
@@ -595,6 +598,7 @@ io.on('connection', (socket) => {
     room.caught = null;
     room.activeGuesserId = null;
     room.guessResult = null;
+    room.imposterGuessText = null;
     room.roundNumber++;
     room.status = 'briefing';
 
@@ -667,6 +671,7 @@ io.on('connection', (socket) => {
     const normalize = (s) => (s || '').trim().toLowerCase().replace(/[^\p{L}\p{N}\s]/gu, '').replace(/\s+/g, ' ').trim();
     const acceptable = [room.secretWord, ...(room.secretAliases || [])].map(normalize);
     const correct = acceptable.includes(normalize(guess));
+    room.imposterGuessText = (guess || '').trim().slice(0, 60) || null;
     finalizeRound(room, correct);
   });
 

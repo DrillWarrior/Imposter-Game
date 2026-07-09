@@ -201,6 +201,26 @@
     return `<button class="link-btn link-btn-danger" id="endRoundBtn">End case &amp; return to lobby</button>`;
   }
 
+  // Status blurb for anyone watching a round they're not part of (a
+  // spectator who joined mid-case). Nothing to report before votes are in;
+  // once they are, say whether the imposter got caught, and once the round
+  // is fully resolved, give the full verdict same as the reveal screen.
+  function renderSpectatorStatus(room) {
+    if (room.status === 'imposter-guess') {
+      return `<div class="muted center">Imposter caught! ${esc(getPlayerName(room.activeGuesserId))} is guessing the real word…</div>`;
+    }
+    if (room.status === 'reveal') {
+      let verdictText;
+      if (room.caught && room.guessResult === true) verdictText = 'Imposter was caught — but guessed the word and steals the round!';
+      else if (room.caught && !room.guessEnabled) verdictText = 'Imposter was caught red-handed. Crew wins the round.';
+      else if (room.caught && room.guessResult === false) verdictText = 'Imposter was caught, and guessed wrong. Crew wins the round.';
+      else if (!room.caught) verdictText = 'The imposter blended in and escaped with the round.';
+      else verdictText = '';
+      return `<div class="muted center">${esc(verdictText)}</div>`;
+    }
+    return '';
+  }
+
   // Picks a font size for a clue so it fits inside the fixed-size cell box
   // instead of the cell growing to fit the text — longer clues shrink down
   // through these tiers rather than expanding the table layout. With the
@@ -573,12 +593,27 @@
     // built around a role they were never assigned.
     const amWaitingForNextRound = room.status !== 'lobby' && !room.turnOrder.includes(state.myId);
     if (amWaitingForNextRound) {
+      const spectatorStatus = renderSpectatorStatus(room);
+      const revealExtras = room.status === 'reveal' ? `
+          <div class="reveal-word-row" style="margin-top:10px;">
+            <div class="reveal-word-box"><div class="lbl">Real Word</div><div class="val">${esc(room.secretWord)}</div></div>
+            <div class="reveal-word-box"><div class="lbl">Imposter Saw (Category)</div><div class="val">${esc(room.imposterHint)}</div></div>
+          </div>
+          ${room.caught && room.guessEnabled !== false ? `
+            <div class="reveal-word-row">
+              <div class="reveal-word-box"><div class="lbl">What The Imposter Guessed</div><div class="val">${room.imposterGuessText ? esc(room.imposterGuessText) : '(no guess submitted)'}</div></div>
+            </div>
+          ` : ''}
+        ` : '';
       return `
         <div class="card">
           <div class="card-title">Case File ${room.roundNumber > 0 ? '&middot; Round ' + room.roundNumber : ''}</div>
           ${codeBlock}
-          <div class="muted center">A case is already underway. You're in the room and will join in when the next one starts.</div>
+          <div class="muted center">A case is already underway. You're spectating and will join in when the next one starts.</div>
+          ${spectatorStatus}
+          ${revealExtras}
         </div>
+        ${room.turnOrder.length ? `<div class="card"><div class="card-title">Case Log</div>${renderClueTable(room)}</div>` : ''}
         ${renderRoster(room, isHost)}
         ${renderEndCaseBtn(isHost)}
         <button class="link-btn" id="leaveBtn">Leave case</button>
@@ -846,6 +881,11 @@
             <div class="reveal-word-box"><div class="lbl">Real Word</div><div class="val">${esc(room.secretWord)}</div></div>
             <div class="reveal-word-box"><div class="lbl">Imposter Saw (Category)</div><div class="val">${esc(room.imposterHint)}</div></div>
           </div>
+          ${room.caught && room.guessEnabled !== false ? `
+            <div class="reveal-word-row">
+              <div class="reveal-word-box"><div class="lbl">What The Imposter Guessed</div><div class="val">${room.imposterGuessText ? esc(room.imposterGuessText) : '(no guess submitted)'}</div></div>
+            </div>
+          ` : ''}
           ${(room.secretAliases && room.secretAliases.length) ? `<div class="muted center" style="margin-top:8px;">Also accepted as a correct guess: <strong>${esc(room.secretAliases.join(', '))}</strong></div>` : ''}
         </div>
         <div class="card"><div class="card-title">Scoreboard</div>${scoreRows}</div>
