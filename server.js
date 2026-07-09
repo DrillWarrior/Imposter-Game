@@ -140,10 +140,15 @@ function sanitize(room) {
     guessResult: room.guessResult,
     chat: room.chat.slice(-50)
   };
+  // Once clue-giving has started, everyone (not just the imposter) gets to
+  // see which category the imposter was briefed on — it's public knowledge
+  // to talk about at the table from that point through the rest of the round.
+  if (['clues', 'discussion', 'voting', 'imposter-guess', 'reveal'].includes(room.status)) {
+    base.imposterHint = room.imposterHint;
+  }
   if (room.status === 'reveal') {
     base.secretWord = room.secretWord;
     base.secretAliases = room.secretAliases;
-    base.imposterHint = room.imposterHint;
     base.imposterIds = room.imposterIds;
   }
   return base;
@@ -528,20 +533,43 @@ io.on('connection', (socket) => {
       return included && !excluded;
     });
     if (eligible.length === 0) return; // nothing matches the chosen categories — host needs to adjust selection
-    const secretEntry = eligible[Math.floor(Math.random() * eligible.length)];
+
+    // Bucket eligible words by category so every category has an equal
+    // chance of being picked for the round, regardless of how many words it
+    // contains — otherwise a category with 50 words would come up far more
+    // often than one with 5. A word with multiple matching tags can land in
+    // more than one bucket, which is fine: it's still only counted once per
+    // category it's picked under.
+    const buckets = {};
+    eligible.forEach(w => {
+      w.tags.forEach(tag => {
+        if (room.categories.length > 0 && !room.categories.includes(tag)) return;
+        if (room.excludedCategories.includes(tag)) return;
+        (buckets[tag] || (buckets[tag] = [])).push(w);
+      });
+    });
+    const bucketCats = Object.keys(buckets);
+    const chosenCategory = bucketCats.length
+      ? bucketCats[Math.floor(Math.random() * bucketCats.length)]
+      : null;
+    const pool = chosenCategory ? buckets[chosenCategory] : eligible;
+    const secretEntry = pool[Math.floor(Math.random() * pool.length)];
     const secret = secretEntry.word;
-    // The imposter no longer gets a decoy word — they see the category itself
-    // (whichever tag on the secret word actually matched the host's selection,
-    // or a random one of the word's tags if the host left categories open).
-    const matchingTags = (room.categories.length === 0
-      ? secretEntry.tags
-      : secretEntry.tags.filter(t => room.categories.includes(t))
-    ).filter(t => !room.excludedCategories.includes(t));
+    // The imposter no longer gets a decoy word — they see the category itself:
+    // the same category the word was just picked under, so it's guaranteed to
+    // be a tag that matched the host's selection.
+    const matchingTags = chosenCategory
+      ? [chosenCategory]
+      : (room.categories.length === 0
+          ? secretEntry.tags
+          : secretEntry.tags.filter(t => room.categories.includes(t))
+        ).filter(t => !room.excludedCategories.includes(t));
     const hintPool = matchingTags.length > 0 ? matchingTags : secretEntry.tags;
     const imposterHint = hintPool[Math.floor(Math.random() * hintPool.length)];
     const ids = room.players.map(p => p.id);
     const impCount = Math.min(room.imposterCount, Math.max(1, ids.length - 1));
     const shuffled = shuffle(ids);
+
 
     room.secretWord = secret;
     room.secretAliases = secretEntry.aliases || [];
