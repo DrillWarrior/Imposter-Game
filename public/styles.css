@@ -252,16 +252,26 @@ select{
 .turn-banner{font-family:var(--font-display);font-weight:600;font-size:14px;letter-spacing:1px;text-align:center;margin-bottom:6px;}
 .turn-banner .who{color:var(--stamp-red);}
 
-.clue-table{width:100%;border-collapse:collapse;font-family:var(--font-mono);font-size:11.5px;margin-top:4px;}
+.clue-table{width:100%;table-layout:fixed;border-collapse:collapse;font-family:var(--font-mono);font-size:11.5px;margin-top:4px;}
 .clue-table th{
   font-family:var(--font-display);font-size:10.5px;letter-spacing:1px;text-transform:uppercase;
-  text-align:left;padding:6px 6px;border-bottom:2px solid var(--text-dark);color:var(--text-dark);
+  text-align:left;padding:6px 4px;border-bottom:2px solid var(--text-dark);color:var(--text-dark);
 }
-.clue-table th.active-col{color:var(--stamp-red);}
-.clue-table td{padding:7px 6px;border-bottom:1px solid rgba(42,38,32,0.12);vertical-align:top;word-break:break-word;}
-.clue-table td.empty{color:#a89f8d;font-style:italic;}
+.clue-table th.clue-round-head{text-align:center;}
+.clue-table td{padding:4px;border-bottom:1px solid rgba(42,38,32,0.12);vertical-align:middle;}
+.clue-table td.active-col{color:var(--stamp-red);}
+.clue-table td.empty .clue-cell-text{color:#a89f8d;font-style:italic;}
 .clue-table td.active-cell{background:rgba(179,64,42,0.08);}
-.clue-round-lbl{font-family:var(--font-mono);font-size:10px;color:#8a8172;white-space:nowrap;}
+.clue-player-cell{font-family:var(--font-display);font-weight:600;font-size:12px;letter-spacing:0.5px;}
+.clue-cell-box{
+  display:flex;align-items:center;justify-content:center;text-align:center;
+  height:44px;overflow:hidden;padding:2px;
+}
+.clue-header-box{height:auto;text-align:left;justify-content:flex-start;}
+.clue-cell-text{
+  display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;
+  word-break:break-word;line-height:1.15;
+}
 
 .vote-grid{display:flex;flex-direction:column;gap:8px;margin-bottom:6px;}
 .vote-option{font-family:var(--font-body);font-weight:600;font-size:14px;padding:11px;border:1.5px solid var(--text-dark);border-radius:3px;background:#fbf8f1;cursor:pointer;text-align:left;display:flex;justify-content:space-between;align-items:center;}

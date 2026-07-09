@@ -201,6 +201,7 @@ function scheduleHostMigration(room, departingHostId) {
 // seal since they've already seen this round's word before refreshing.
 function sendRoleTo(room, playerId, socket) {
   if (!room.secretWord || room.status === 'lobby') return;
+  if (!room.turnOrder.includes(playerId)) return; // joined mid-round — sitting this one out, no role to send
   const isImposter = room.imposterIds.includes(playerId);
   socket.emit('your-role', {
     isImposter,
@@ -379,7 +380,8 @@ io.on('connection', (socket) => {
     const room = getRoom(code);
     if (!cleanName) return socket.emit('join-error', { message: 'Enter your name first.' });
     if (!room) return socket.emit('join-error', { message: 'No case found with that code.' });
-    if (room.status !== 'lobby') return socket.emit('join-error', { message: 'That case is already in progress. Ask the host to wait for the next round.' });
+
+    const joiningMidRound = room.status !== 'lobby';
 
     const playerId = crypto.randomUUID();
     const token = crypto.randomUUID();
@@ -390,9 +392,17 @@ io.on('connection', (socket) => {
     socket.data.roomCode = room.code;
     socket.data.playerId = playerId;
 
+    // They're in the room/roster now, but this round's turnOrder/imposterIds
+    // were already locked in when it started, so they simply sit out — the
+    // client shows a waiting screen — until the host starts the next round.
+    if (joiningMidRound) {
+      pushSystemMessage(room, `${cleanName} joined and will jump in next round.`);
+    }
+
     socket.emit('joined', { code: room.code, playerId, token });
     broadcastRoom(room);
   });
+
 
   socket.on('reconnect-room', ({ code, playerId, token }) => {
     const room = getRoom(code);
@@ -490,7 +500,7 @@ io.on('connection', (socket) => {
         scheduleTurnTimer(room); // reschedule for whoever the turn now lands on
       }
     } else if (room.status === 'voting') {
-      const connectedCount = room.players.filter(p => p.connected).length;
+      const connectedCount = room.players.filter(p => p.connected && room.turnOrder.includes(p.id)).length;
       if (connectedCount > 0 && Object.keys(room.votes).length >= connectedCount) {
         computeVoteResult(room);
         return; // computeVoteResult already broadcasts
@@ -629,10 +639,11 @@ io.on('connection', (socket) => {
   socket.on('cast-vote', ({ suspectId }) => {
     const room = getRoom(socket.data.roomCode);
     if (!room || room.status !== 'voting') return;
-    if (!room.players.find(p => p.id === suspectId)) return;
+    if (!room.turnOrder.includes(socket.data.playerId)) return; // joined mid-round — sitting this one out
+    if (!room.turnOrder.includes(suspectId)) return;
     if (suspectId === socket.data.playerId) return;
     room.votes[socket.data.playerId] = suspectId;
-    const connectedCount = room.players.filter(p => p.connected).length;
+    const connectedCount = room.players.filter(p => p.connected && room.turnOrder.includes(p.id)).length;
     if (Object.keys(room.votes).length >= connectedCount) {
       computeVoteResult(room);
     } else {

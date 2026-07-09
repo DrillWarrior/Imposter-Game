@@ -201,22 +201,47 @@
     return `<button class="link-btn link-btn-danger" id="endRoundBtn">End case &amp; return to lobby</button>`;
   }
 
+  // Picks a font size for a clue so it fits inside the fixed-size cell box
+  // instead of the cell growing to fit the text — longer clues shrink down
+  // through these tiers rather than expanding the table layout. With the
+  // round columns now fixed at 3 regardless of player count, this only
+  // needs to react to the clue's own length, not the player count.
+  function clueFontSize(text) {
+    const len = (text || '').length;
+    if (len <= 10) return 12;
+    if (len <= 18) return 11;
+    if (len <= 28) return 10;
+    if (len <= 40) return 9;
+    if (len <= 55) return 8.5;
+    return 8;
+  }
+  // One row per player, one column per round. Rounds are always capped at
+  // 3, so column width (and therefore clue text size) stays constant no
+  // matter how many players are in the game — only the table grows
+  // taller, which is cheap, instead of columns getting squeezed and text
+  // shrinking further with every player added.
   function renderClueTable(room) {
     const currentId = room.turnOrder[room.currentTurnIndex];
-    const cols = room.turnOrder;
-    const headerCells = cols.map(id => `<th class="${room.status === 'clues' && id === currentId ? 'active-col' : ''}">${esc(getPlayerName(id))}</th>`).join('');
-    const bodyRows = [0, 1, 2].map(r => {
-      const cells = cols.map(id => {
+    const players = room.turnOrder;
+    const colGroup = `<colgroup><col style="width:30%;"/><col style="width:23.33%;"/><col style="width:23.33%;"/><col style="width:23.34%;"/></colgroup>`;
+    const headerCells = `<th></th><th class="clue-round-head">R1</th><th class="clue-round-head">R2</th><th class="clue-round-head">R3</th>`;
+    const bodyRows = players.map(id => {
+      const isCurrentPlayer = room.status === 'clues' && id === currentId;
+      const nameCell = `<td class="clue-player-cell ${isCurrentPlayer ? 'active-col' : ''}"><div class="clue-cell-box clue-header-box"><span class="clue-cell-text">${esc(getPlayerName(id))}</span></div></td>`;
+      const roundCells = [0, 1, 2].map(r => {
         const val = (room.clueLog[id] || [])[r];
-        const isActiveCell = room.status === 'clues' && (r === room.clueRound - 1) && id === currentId;
-        if (val === null || val === undefined) return `<td class="${isActiveCell ? 'active-cell' : 'empty'}">${isActiveCell ? '…' : '—'}</td>`;
-        return `<td>${esc(val)}</td>`;
+        const isActiveCell = isCurrentPlayer && r === room.clueRound - 1;
+        if (val === null || val === undefined) {
+          return `<td class="${isActiveCell ? 'active-cell' : 'empty'}"><div class="clue-cell-box"><span class="clue-cell-text">${isActiveCell ? '…' : '—'}</span></div></td>`;
+        }
+        return `<td><div class="clue-cell-box"><span class="clue-cell-text" style="font-size:${clueFontSize(val)}px;">${esc(val)}</span></div></td>`;
       }).join('');
-      return `<tr><td class="clue-round-lbl">R${r + 1}</td>${cells}</tr>`;
+      return `<tr>${nameCell}${roundCells}</tr>`;
     }).join('');
     return `
       <table class="clue-table">
-        <thead><tr><td></td>${headerCells}</tr></thead>
+        ${colGroup}
+        <thead><tr>${headerCells}</tr></thead>
         <tbody>${bodyRows}</tbody>
       </table>
     `;
@@ -542,6 +567,24 @@
     const isHost = state.myId === room.hostId;
     const codeBlock = `<div class="code-badge">${esc(room.code)}</div>`;
 
+    // Joined while a case was already underway: this round's turnOrder was
+    // locked in before they arrived, so they wait here (visible in the
+    // roster, able to chat) rather than seeing briefing/clue/vote screens
+    // built around a role they were never assigned.
+    const amWaitingForNextRound = room.status !== 'lobby' && !room.turnOrder.includes(state.myId);
+    if (amWaitingForNextRound) {
+      return `
+        <div class="card">
+          <div class="card-title">Case File ${room.roundNumber > 0 ? '&middot; Round ' + room.roundNumber : ''}</div>
+          ${codeBlock}
+          <div class="muted center">A case is already underway. You're in the room and will join in when the next one starts.</div>
+        </div>
+        ${renderRoster(room, isHost)}
+        ${renderEndCaseBtn(isHost)}
+        <button class="link-btn" id="leaveBtn">Leave case</button>
+      `;
+    }
+
     if (room.status === 'lobby') {
       const playerRows = room.players.map(p => `
         <div class="player-row">
@@ -720,9 +763,9 @@
 
     if (room.status === 'voting') {
       const votedCount = room.votedCount || 0;
-      const options = room.players.filter(p => p.id !== state.myId).map(p => {
-        const selected = state.local.voteSelection === p.id;
-        return `<div class="vote-option ${selected ? 'selected' : ''}" data-vote="${p.id}">${esc(p.name)} ${selected ? '&#10003;' : ''}</div>`;
+      const options = room.turnOrder.filter(id => id !== state.myId).map(id => {
+        const selected = state.local.voteSelection === id;
+        return `<div class="vote-option ${selected ? 'selected' : ''}" data-vote="${id}">${esc(getPlayerName(id))} ${selected ? '&#10003;' : ''}</div>`;
       }).join('');
 
       const hostControls = isHost ? `<button class="btn btn-red" id="forceRevealBtn">Force Reveal Vote</button>` : '';
@@ -732,8 +775,9 @@
         <div class="card">
           <div class="card-title">Cast Your Suspicion</div>
           ${renderCategoryHint(room)}
-          <div class="vote-grid" style="${state.local.voted ? 'pointer-events:none;opacity:0.7;' : ''}">${options}</div>
-          <div class="vote-count">${votedCount} / ${room.players.length} agents have voted</div>
+          <div class="vote-grid">${options}</div>
+          <div class="vote-count">${votedCount} / ${room.turnOrder.length} agents have voted</div>
+          ${state.local.voted ? '<div class="muted center">Tap another agent to change your vote.</div>' : ''}
         </div>
         <div class="card">${hostControls || '<div class="muted center">Waiting for the reveal.</div>'}</div>
         ${renderRoster(room, isHost)}
@@ -875,7 +919,7 @@
     if (byId('submitClueBtn')) byId('submitClueBtn').onclick = window.__imp_submitClue;
 
     document.querySelectorAll('.vote-option').forEach(el => {
-      el.onclick = () => { if (!state.local.voted) window.__imp_castVote(el.getAttribute('data-vote')); };
+      el.onclick = () => window.__imp_castVote(el.getAttribute('data-vote'));
     });
     if (byId('forceRevealBtn')) byId('forceRevealBtn').onclick = window.__imp_forceReveal;
 
