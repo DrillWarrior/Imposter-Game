@@ -11,6 +11,24 @@ const io = new Server(server);
 
 app.use(express.static(path.join(__dirname, 'public')));
 
+// ---------- LIMITS & TIMING ----------
+// Every hardcoded cap/length limit in the file lives here, named, instead of
+// scattered as bare numbers at each call site.
+const MAX_PLAYER_NAME_LENGTH = 18;
+const MAX_CUSTOM_WORD_LENGTH = 40;
+const MAX_CUSTOM_TAG_LENGTH = 24;
+const MAX_CUSTOM_WORDS_PER_ROOM = 50;
+const MAX_CLUE_LENGTH = 60;
+const MAX_CHAT_MESSAGE_LENGTH = 300;
+const MAX_CHAT_HISTORY = 200;
+const MIN_IMPOSTERS = 1;
+const MAX_IMPOSTERS = 2;
+const MIN_TURN_SECONDS = 5;
+const MAX_TURN_SECONDS = 180;
+// If the host disconnects, give them this long to reconnect (e.g. a page
+// refresh) before handing host duties to someone else who's still around.
+const HOST_GRACE_MS = 15000;
+
 // ---------- WORD BANK ----------
 // The word list lives in wordbank.txt (same folder as this file) so it can be
 // edited without touching any code. Each line there is:
@@ -175,11 +193,17 @@ function recordClue(room, playerId, text) {
 // ---------- HOST MIGRATION ----------
 // If the host disconnects, give them a window to reconnect (e.g. a page
 // refresh) before handing host duties to someone else who's still around.
-const HOST_GRACE_MS = 15000;
+
+// Appends a chat entry (system or player) and trims history to the cap.
+// Both system messages and player messages funnel through here so the
+// trim-to-limit logic exists in exactly one place.
+function pushChatEntry(room, entry) {
+  room.chat.push({ id: crypto.randomUUID(), ts: Date.now(), ...entry });
+  if (room.chat.length > MAX_CHAT_HISTORY) room.chat = room.chat.slice(-MAX_CHAT_HISTORY);
+}
 
 function pushSystemMessage(room, text) {
-  room.chat.push({ id: crypto.randomUUID(), playerId: null, name: 'System', text, ts: Date.now(), system: true });
-  if (room.chat.length > 200) room.chat = room.chat.slice(-200);
+  pushChatEntry(room, { playerId: null, name: 'System', text, system: true });
 }
 
 function scheduleHostMigration(room, departingHostId) {
@@ -255,7 +279,6 @@ function computeVoteResult(room) {
   let max = 0;
   Object.values(tally).forEach(v => { if (v > max) max = v; });
   const accused = max > 0 ? Object.keys(tally).filter(id => tally[id] === max) : [];
-  room.tally = tally;
   room.accusedIds = accused;
   room.turnEndsAt = null;
 
@@ -320,17 +343,11 @@ function allCategoriesForRoom(room) {
   return Array.from(new Set([...CATEGORY_NAMES, ...room.customWords.flatMap(w => w.tags)])).sort();
 }
 
-// Resets all per-round fields and sends the room back to the lobby /
-// category-select screen. Shared by the normal "start next round" flow
-// (from reveal) and the host's "end case early" abort (from any phase).
-function resetToLobby(room) {
-  clearRoomTimer(room);
-  room.status = 'lobby';
-  room.secretWord = null;
-  room.secretAliases = [];
-  room.imposterHint = null;
-  room.imposterIds = [];
-  room.turnOrder = [];
+// Fields that get wiped both when returning to the lobby (nothing to reset
+// *to*) and at the start of a fresh round (about to be filled back in with
+// real values) — kept in one place so a new field only needs adding once,
+// instead of being kept in sync by hand across two reset sites.
+function resetRoundTrackingFields(room) {
   room.currentTurnIndex = 0;
   room.clueRound = 1;
   room.clueLog = {};
@@ -343,12 +360,26 @@ function resetToLobby(room) {
   room.imposterGuessText = null;
 }
 
+// Resets all per-round fields and sends the room back to the lobby /
+// category-select screen. Shared by the normal "start next round" flow
+// (from reveal) and the host's "end case early" abort (from any phase).
+function resetToLobby(room) {
+  clearRoomTimer(room);
+  room.status = 'lobby';
+  room.secretWord = null;
+  room.secretAliases = [];
+  room.imposterHint = null;
+  room.imposterIds = [];
+  room.turnOrder = [];
+  resetRoundTrackingFields(room);
+}
+
 
 function addOneCustomWord(room, word, tag) {
-  const cleanWord = (word || '').trim().slice(0, 40);
+  const cleanWord = (word || '').trim().slice(0, MAX_CUSTOM_WORD_LENGTH);
   if (!cleanWord) return false;
-  if (room.customWords.length >= 50) return false;
-  const cleanTag = (tag || '').trim().slice(0, 24) || 'Custom';
+  if (room.customWords.length >= MAX_CUSTOM_WORDS_PER_ROOM) return false;
+  const cleanTag = (tag || '').trim().slice(0, MAX_CUSTOM_TAG_LENGTH) || 'Custom';
   room.customWords.push({ id: crypto.randomUUID(), word: cleanWord, tags: [cleanTag] });
   return true;
 }
@@ -362,7 +393,7 @@ io.on('connection', (socket) => {
   socket.data.playerId = null;
 
   socket.on('create-room', ({ name }) => {
-    const cleanName = (name || '').trim().slice(0, 18);
+    const cleanName = (name || '').trim().slice(0, MAX_PLAYER_NAME_LENGTH);
     if (!cleanName) return socket.emit('join-error', { message: 'Enter your name first.' });
     const code = uniqueCode();
     const playerId = crypto.randomUUID();
@@ -379,7 +410,7 @@ io.on('connection', (socket) => {
   });
 
   socket.on('join-room', ({ code, name }) => {
-    const cleanName = (name || '').trim().slice(0, 18);
+    const cleanName = (name || '').trim().slice(0, MAX_PLAYER_NAME_LENGTH);
     const room = getRoom(code);
     if (!cleanName) return socket.emit('join-error', { message: 'Enter your name first.' });
     if (!room) return socket.emit('join-error', { message: 'No case found with that code.' });
@@ -454,7 +485,7 @@ io.on('connection', (socket) => {
     if (!room || socket.data.playerId !== room.hostId || room.status !== 'lobby') return;
     if (!Array.isArray(entries)) return;
     let addedAny = false;
-    entries.slice(0, 50).forEach(entry => {
+    entries.slice(0, MAX_CUSTOM_WORDS_PER_ROOM).forEach(entry => {
       if (addOneCustomWord(room, entry && entry.word, entry && entry.tag)) addedAny = true;
     });
     if (addedAny) broadcastRoom(room);
@@ -527,9 +558,9 @@ io.on('connection', (socket) => {
       const valid = allCategoriesForRoom(room);
       room.excludedCategories = Array.from(new Set(excludedCategories.filter(c => valid.includes(c))));
     }
-    if (imposterCount) room.imposterCount = Math.max(1, Math.min(2, parseInt(imposterCount, 10) || 1));
-    if (clueSeconds) room.clueSeconds = Math.max(5, Math.min(180, parseInt(clueSeconds, 10) || 30));
-    if (guessSeconds) room.guessSeconds = Math.max(5, Math.min(180, parseInt(guessSeconds, 10) || 20));
+    if (imposterCount) room.imposterCount = Math.max(MIN_IMPOSTERS, Math.min(MAX_IMPOSTERS, parseInt(imposterCount, 10) || MIN_IMPOSTERS));
+    if (clueSeconds) room.clueSeconds = Math.max(MIN_TURN_SECONDS, Math.min(MAX_TURN_SECONDS, parseInt(clueSeconds, 10) || 30));
+    if (guessSeconds) room.guessSeconds = Math.max(MIN_TURN_SECONDS, Math.min(MAX_TURN_SECONDS, parseInt(guessSeconds, 10) || 20));
     if (typeof guessEnabled === 'boolean') room.guessEnabled = guessEnabled;
     broadcastRoom(room);
   });
@@ -580,6 +611,7 @@ io.on('connection', (socket) => {
     const hintPool = matchingTags.length > 0 ? matchingTags : secretEntry.tags;
     const imposterHint = hintPool[Math.floor(Math.random() * hintPool.length)];
     const ids = room.players.map(p => p.id);
+    // Never let every player be an imposter — always leave at least one crew member.
     const impCount = Math.min(room.imposterCount, Math.max(1, ids.length - 1));
     const shuffled = shuffle(ids);
 
@@ -589,16 +621,8 @@ io.on('connection', (socket) => {
     room.imposterHint = imposterHint;
     room.imposterIds = shuffled.slice(0, impCount);
     room.turnOrder = shuffle(ids);
-    room.currentTurnIndex = 0;
-    room.clueRound = 1;
-    room.clueLog = {};
-    ids.forEach(id => { room.clueLog[id] = [null, null, null]; });
-    room.votes = {};
-    room.accusedIds = [];
-    room.caught = null;
-    room.activeGuesserId = null;
-    room.guessResult = null;
-    room.imposterGuessText = null;
+    resetRoundTrackingFields(room);
+    ids.forEach(id => { room.clueLog[id] = [null, null, null]; }); // must run after the reset above, which sets clueLog back to {}
     room.roundNumber++;
     room.status = 'briefing';
 
@@ -634,7 +658,7 @@ io.on('connection', (socket) => {
     if (!room || room.status !== 'clues') return;
     const currentPlayerId = room.turnOrder[room.currentTurnIndex];
     if (socket.data.playerId !== currentPlayerId) return;
-    const clean = (text || '').trim().slice(0, 60);
+    const clean = (text || '').trim().slice(0, MAX_CLUE_LENGTH);
     if (!clean) return;
     recordClue(room, currentPlayerId, clean);
     moveToNextTurn(room);
@@ -671,7 +695,7 @@ io.on('connection', (socket) => {
     const normalize = (s) => (s || '').trim().toLowerCase().replace(/[^\p{L}\p{N}\s]/gu, '').replace(/\s+/g, ' ').trim();
     const acceptable = [room.secretWord, ...(room.secretAliases || [])].map(normalize);
     const correct = acceptable.includes(normalize(guess));
-    room.imposterGuessText = (guess || '').trim().slice(0, 60) || null;
+    room.imposterGuessText = (guess || '').trim().slice(0, MAX_CLUE_LENGTH) || null;
     finalizeRound(room, correct);
   });
 
@@ -698,10 +722,9 @@ io.on('connection', (socket) => {
     if (!room) return;
     const player = room.players.find(p => p.id === socket.data.playerId);
     if (!player) return;
-    const clean = (text || '').trim().slice(0, 300);
+    const clean = (text || '').trim().slice(0, MAX_CHAT_MESSAGE_LENGTH);
     if (!clean) return;
-    room.chat.push({ id: crypto.randomUUID(), playerId: player.id, name: player.name, text: clean, ts: Date.now() });
-    if (room.chat.length > 200) room.chat = room.chat.slice(-200);
+    pushChatEntry(room, { playerId: player.id, name: player.name, text: clean });
     broadcastRoom(room);
   });
 

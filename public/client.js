@@ -196,6 +196,17 @@
 
   // Host-only escape hatch: abort the in-progress case at any point and
   // send everyone back to the lobby / category-select screen.
+  // Shared verdict wording for how a round ended — used on both the active
+  // reveal screen and the spectator status line, so this only needs updating
+  // in one place if the wording ever changes.
+  function getVerdictText(room) {
+    if (room.caught && room.guessResult === true) return 'Caught — but guessed the word and steals the round!';
+    if (room.caught && !room.guessEnabled) return 'Caught red-handed. Crew wins the round.';
+    if (room.caught && room.guessResult === false) return 'Caught, and guessed wrong. Crew wins the round.';
+    if (!room.caught) return 'The imposter blended in and escaped with the round.';
+    return '';
+  }
+
   function renderEndCaseBtn(isHost) {
     if (!isHost) return '';
     return `<button class="link-btn link-btn-danger" id="endRoundBtn">End case &amp; return to lobby</button>`;
@@ -210,13 +221,7 @@
       return `<div class="muted center">Imposter caught! ${esc(getPlayerName(room.activeGuesserId))} is guessing the real word…</div>`;
     }
     if (room.status === 'reveal') {
-      let verdictText;
-      if (room.caught && room.guessResult === true) verdictText = 'Imposter was caught — but guessed the word and steals the round!';
-      else if (room.caught && !room.guessEnabled) verdictText = 'Imposter was caught red-handed. Crew wins the round.';
-      else if (room.caught && room.guessResult === false) verdictText = 'Imposter was caught, and guessed wrong. Crew wins the round.';
-      else if (!room.caught) verdictText = 'The imposter blended in and escaped with the round.';
-      else verdictText = '';
-      return `<div class="muted center">${esc(verdictText)}</div>`;
+      return `<div class="muted center">${esc(getVerdictText(room))}</div>`;
     }
     return '';
   }
@@ -854,12 +859,7 @@
     if (room.status === 'reveal') {
       const accusedNames = (room.accusedIds || []).map(getPlayerName).join(', ') || 'No majority';
       const imposterNames = (room.imposterIds || []).map(getPlayerName).join(', ');
-      let verdictText;
-      if (room.caught && room.guessResult === true) verdictText = 'Caught — but guessed the word and steals the round!';
-      else if (room.caught && !room.guessEnabled) verdictText = 'Caught red-handed. Crew wins the round.';
-      else if (room.caught && room.guessResult === false) verdictText = 'Caught, and guessed wrong. Crew wins the round.';
-      else if (!room.caught) verdictText = 'The imposter blended in and escapes with the round.';
-      else verdictText = '';
+      const verdictText = getVerdictText(room);
 
       const scoreRows = room.players.slice()
         .sort((a, b) => (b.score || 0) - (a.score || 0))
