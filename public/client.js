@@ -1,6 +1,15 @@
 (function () {
   const socket = io();
 
+  // Categories tied to a specific fandom/franchise get grouped under
+  // "Fandom / Niche" in the picker; everything else falls under "General".
+  // New tags added to the word bank default to General unless listed here.
+  const NICHE_CATEGORIES = new Set([
+    'League of Legends', 'One Piece', 'Demon Slayer', 'Anime',
+    'Jujutsu Kaisen', 'Attack on Titan', 'Harry Potter', 'Valorant',
+    'Marvel & DC'
+  ]);
+
   // ---------- SESSION PERSISTENCE (for reconnecting after a reload/drop) ----------
   const SESSION_KEY = 'imposter_session';
   function saveSession(session) {
@@ -70,6 +79,14 @@
     const p = (state.room && state.room.players || []).find(p => p.id === id);
     return p ? p.name : 'Unknown';
   }
+  // The specific category the imposter was briefed on this round (as opposed
+  // to categoryLabel(), which shows the host's overall category *settings*).
+  // Server only sends this once clue-giving has started, so it doubles as
+  // "is it time to show this yet" — everyone sees it from then on.
+  function renderCategoryHint(room) {
+    if (!room.imposterHint) return '';
+    return `<div class="muted center" style="margin-bottom:8px;">This round's category: <strong>${esc(room.imposterHint)}</strong></div>`;
+  }
   function categoryLabel(room) {
     const base = (!room.categories || room.categories.length === 0) ? 'All Categories' : room.categories.join(', ');
     const excluded = room.excludedCategories || [];
@@ -84,19 +101,30 @@
     if (excluded.includes(cat)) return 'exclude';
     return 'default';
   }
+  function renderCatRow(idPrefix, c, included, excluded) {
+    const st = catState(c, included, excluded);
+    const icon = st === 'include' ? '&check;' : st === 'exclude' ? '&times;' : '';
+    return `
+      <div class="cat-check tri-row tri-${idPrefix}" data-cat="${esc(c)}">
+        <span class="tri-box tri-${st}">${icon}</span>
+        <span>${esc(c)}</span>
+      </div>`;
+  }
   function renderCatPicker(idPrefix, allCats, included, excluded, filterVal, panelOpen) {
     const filterText = (filterVal || '').trim().toLowerCase();
     const filteredCats = filterText ? allCats.filter(c => c.toLowerCase().includes(filterText)) : allCats;
+    const generalCats = filteredCats.filter(c => !NICHE_CATEGORIES.has(c));
+    const nicheCats = filteredCats.filter(c => NICHE_CATEGORIES.has(c));
     const rows = filteredCats.length
-      ? filteredCats.map(c => {
-          const st = catState(c, included, excluded);
-          const icon = st === 'include' ? '&check;' : st === 'exclude' ? '&times;' : '';
-          return `
-          <div class="cat-check tri-row tri-${idPrefix}" data-cat="${esc(c)}">
-            <span class="tri-box tri-${st}">${icon}</span>
-            <span>${esc(c)}</span>
-          </div>`;
-        }).join('')
+      ? `
+        ${generalCats.length ? `
+          <div class="cat-group-header">General</div>
+          ${generalCats.map(c => renderCatRow(idPrefix, c, included, excluded)).join('')}
+        ` : ''}
+        ${nicheCats.length ? `
+          <div class="cat-group-header">Fandom / Niche</div>
+          ${nicheCats.map(c => renderCatRow(idPrefix, c, included, excluded)).join('')}
+        ` : ''}`
       : `<div class="muted center" style="padding:10px 0;">No categories match "${esc(filterVal)}"</div>`;
 
     let summary;
@@ -658,6 +686,7 @@
         ${renderMyWordCard()}
         <div class="card">
           <div class="card-title">Interrogation &middot; ${esc(categoryLabel(room))}</div>
+          ${renderCategoryHint(room)}
           ${turnBanner}
           ${timerBlock}
           ${actionBlock}
@@ -678,6 +707,7 @@
         ${renderMyWordCard()}
         <div class="card">
           <div class="card-title">Open Discussion</div>
+          ${renderCategoryHint(room)}
           <div class="muted center">All clues are in. Talk it through, then ${isHost ? 'open voting when ready.' : 'wait for the host.'}</div>
         </div>
         <div class="card"><div class="card-title">Case Log</div>${renderClueTable(room)}</div>
@@ -701,6 +731,7 @@
         ${renderMyWordCard()}
         <div class="card">
           <div class="card-title">Cast Your Suspicion</div>
+          ${renderCategoryHint(room)}
           <div class="vote-grid" style="${state.local.voted ? 'pointer-events:none;opacity:0.7;' : ''}">${options}</div>
           <div class="vote-count">${votedCount} / ${room.players.length} agents have voted</div>
         </div>
@@ -729,10 +760,12 @@
         ${renderMyWordCard()}
         <div class="card">
           <div class="card-title">Last Chance</div>
+          ${renderCategoryHint(room)}
           <div class="stamp-block"><div class="stamp-text stamp-compromised">CAUGHT</div></div>
           ${timerBlock}
           ${inner}
         </div>
+        <div class="card"><div class="card-title">Case Log</div>${renderClueTable(room)}</div>
         ${renderRoster(room, isHost)}
         ${renderEndCaseBtn(isHost)}
         <button class="link-btn" id="leaveBtn">Leave case</button>
